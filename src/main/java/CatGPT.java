@@ -6,5 +6,8 @@ public class CatGPT {
                 + "| |__| (_| | |_| |_| |  __/ | |  \n"
                 + " \\____\\__,_|\\__|\\____|_|    |_|  \n";
         System.out.println(banner);
+        System.out.println("Hello! I'm CatGPT.");
+        System.out.println("What can I do for you?");
+        System.out.println("Bye. Hope to see you again soon!");
     }
 }
