@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 public class CatGPT {
     public static void main(String[] args) {
         String banner = "  ____      _    ____ ____ _____ \n"
@@ -8,6 +10,17 @@ public class CatGPT {
         System.out.println(banner);
         System.out.println("Hello! I'm CatGPT.");
         System.out.println("What can I do for you?");
-        System.out.println("Bye. Hope to see you again soon!");
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            String input = scanner.nextLine();
+
+            if (input.equals("bye")) {
+                System.out.println("Bye. Hope to see you again soon!");
+                break;
+            }
+
+            System.out.println(input);
+        }
     }
 }
