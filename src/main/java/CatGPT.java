@@ -9,15 +9,15 @@ public class CatGPT {
     /**
      * Formats a task with its type, completion status, description, and optional timing details.
      *
-     * @param taskType the task type marker, such as T, D, or E
+     * @param taskType the category of the task
      * @param isDone whether the task has been completed
      * @param description the task description
      * @param suffix optional timing details to append to the description
      * @return the formatted task
      */
-    private static String formatTask(String taskType, boolean isDone, String description, String suffix) {
+    private static String formatTask(TaskType taskType, boolean isDone, String description, String suffix) {
         String status = isDone ? "X" : " ";
-        return "[" + taskType + "][" + status + "] " + description + suffix;
+        return "[" + taskType.getMarker() + "][" + status + "] " + description + suffix;
     }
 
     /**
@@ -64,7 +64,7 @@ public class CatGPT {
         System.out.println("What can I do for you?");
         Scanner scanner = new Scanner(System.in);
         String[] tasks = new String[MAX_TASKS];
-        String[] taskTypes = new String[MAX_TASKS];
+        TaskType[] taskTypes = new TaskType[MAX_TASKS];
         String[] taskSuffixes = new String[MAX_TASKS];
         boolean[] isDone = new boolean[MAX_TASKS];
         int taskCount = 0;
@@ -126,11 +126,11 @@ public class CatGPT {
                         throw new CatGPTException("Your task list is full.");
                     }
                     tasks[taskCount] = description;
-                    taskTypes[taskCount] = "T";
+                    taskTypes[taskCount] = TaskType.TODO;
                     taskSuffixes[taskCount] = "";
                     taskCount++;
                     System.out.println("Got it. I've added this task:");
-                    System.out.println(formatTask("T", false, description, ""));
+                    System.out.println(formatTask(TaskType.TODO, false, description, ""));
                     String taskWord = taskCount == 1 ? "task" : "tasks";
                     System.out.println("Now you have " + taskCount + " " + taskWord + " in the list.");
                 } else if (input.equals("deadline") || input.startsWith("deadline ")) {
@@ -152,11 +152,11 @@ public class CatGPT {
                     }
                     String suffix = " (by: " + by + ")";
                     tasks[taskCount] = description;
-                    taskTypes[taskCount] = "D";
+                    taskTypes[taskCount] = TaskType.DEADLINE;
                     taskSuffixes[taskCount] = suffix;
                     taskCount++;
                     System.out.println("Got it. I've added this task:");
-                    System.out.println(formatTask("D", false, description, suffix));
+                    System.out.println(formatTask(TaskType.DEADLINE, false, description, suffix));
                     String taskWord = taskCount == 1 ? "task" : "tasks";
                     System.out.println("Now you have " + taskCount + " " + taskWord + " in the list.");
                 } else if (input.equals("event") || input.startsWith("event ")) {
@@ -180,11 +180,11 @@ public class CatGPT {
                     }
                     String suffix = " (from: " + from + " to: " + to + ")";
                     tasks[taskCount] = description;
-                    taskTypes[taskCount] = "E";
+                    taskTypes[taskCount] = TaskType.EVENT;
                     taskSuffixes[taskCount] = suffix;
                     taskCount++;
                     System.out.println("Got it. I've added this task:");
-                    System.out.println(formatTask("E", false, description, suffix));
+                    System.out.println(formatTask(TaskType.EVENT, false, description, suffix));
                     String taskWord = taskCount == 1 ? "task" : "tasks";
                     System.out.println("Now you have " + taskCount + " " + taskWord + " in the list.");
                 } else if (input.isEmpty()) {
