@@ -11,6 +11,8 @@ public class CatGPT {
         System.out.println("Hello! I'm CatGPT.");
         System.out.println("What can I do for you?");
         Scanner scanner = new Scanner(System.in);
+        String[] tasks = new String[100];
+        int taskCount = 0;
 
         while (true) {
             String input = scanner.nextLine();
@@ -18,9 +20,16 @@ public class CatGPT {
             if (input.equals("bye")) {
                 System.out.println("Bye. Hope to see you again soon!");
                 break;
+            } else if (input.equals("list")) {
+                System.out.println("Here are the tasks in your list:");
+                for (int i = 0; i < taskCount; i++) {
+                    System.out.println((i + 1) + ". " + tasks[i]);
+                }
+            } else {
+                tasks[taskCount] = input;
+                taskCount++;
+                System.out.println("Added: " + input);
             }
-
-            System.out.println(input);
         }
     }
 }
