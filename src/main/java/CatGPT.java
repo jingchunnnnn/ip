@@ -21,7 +21,7 @@ public class CatGPT {
     }
 
     /**
-     * Parses and validates the task number supplied to a mark or unmark command.
+     * Parses and validates the task number supplied to a task-selection command.
      *
      * @param input the full user command
      * @param command the command word to remove before parsing the number
@@ -98,6 +98,25 @@ public class CatGPT {
                     System.out.println("OK! I've marked this task as not done yet:");
                     System.out.println(formatTask(
                             taskTypes[taskIndex], isDone[taskIndex], tasks[taskIndex], taskSuffixes[taskIndex]));
+                } else if (input.equals("delete") || input.startsWith("delete ")) {
+                    int taskIndex = parseTaskIndex(input, "delete", taskCount);
+                    String deletedTask = formatTask(
+                            taskTypes[taskIndex], isDone[taskIndex], tasks[taskIndex], taskSuffixes[taskIndex]);
+                    for (int i = taskIndex; i < taskCount - 1; i++) {
+                        tasks[i] = tasks[i + 1];
+                        taskTypes[i] = taskTypes[i + 1];
+                        taskSuffixes[i] = taskSuffixes[i + 1];
+                        isDone[i] = isDone[i + 1];
+                    }
+                    taskCount--;
+                    tasks[taskCount] = null;
+                    taskTypes[taskCount] = null;
+                    taskSuffixes[taskCount] = null;
+                    isDone[taskCount] = false;
+                    System.out.println("Noted. I've removed this task:");
+                    System.out.println(deletedTask);
+                    String taskWord = taskCount == 1 ? "task" : "tasks";
+                    System.out.println("Now you have " + taskCount + " " + taskWord + " in the list.");
                 } else if (input.equals("todo") || input.startsWith("todo ")) {
                     String description = input.substring(4).trim();
                     if (description.isEmpty()) {
