@@ -5,6 +5,7 @@ import java.util.Scanner;
  */
 public class CatGPT {
     private static final int MAX_TASKS = 100;
+    private static final String DATA_FILE_PATH = "./data/catgpt.txt";
 
     /**
      * Formats a task with its type, completion status, description, and optional timing details.
@@ -68,6 +69,12 @@ public class CatGPT {
         String[] taskSuffixes = new String[MAX_TASKS];
         boolean[] isDone = new boolean[MAX_TASKS];
         int taskCount = 0;
+        Storage storage = new Storage(DATA_FILE_PATH);
+        try {
+            taskCount = storage.load(tasks, taskTypes, taskSuffixes, isDone);
+        } catch (CatGPTException error) {
+            System.out.println("OOPS!!! " + error.getMessage());
+        }
 
         while (true) {
             if (!scanner.hasNextLine()) {
@@ -89,12 +96,14 @@ public class CatGPT {
                 } else if (input.equals("mark") || input.startsWith("mark ")) {
                     int taskIndex = parseTaskIndex(input, "mark", taskCount);
                     isDone[taskIndex] = true;
+                    storage.save(tasks, taskTypes, taskSuffixes, isDone, taskCount);
                     System.out.println("Nice! I've marked this task as done:");
                     System.out.println(formatTask(
                             taskTypes[taskIndex], isDone[taskIndex], tasks[taskIndex], taskSuffixes[taskIndex]));
                 } else if (input.equals("unmark") || input.startsWith("unmark ")) {
                     int taskIndex = parseTaskIndex(input, "unmark", taskCount);
                     isDone[taskIndex] = false;
+                    storage.save(tasks, taskTypes, taskSuffixes, isDone, taskCount);
                     System.out.println("OK! I've marked this task as not done yet:");
                     System.out.println(formatTask(
                             taskTypes[taskIndex], isDone[taskIndex], tasks[taskIndex], taskSuffixes[taskIndex]));
@@ -113,6 +122,7 @@ public class CatGPT {
                     taskTypes[taskCount] = null;
                     taskSuffixes[taskCount] = null;
                     isDone[taskCount] = false;
+                    storage.save(tasks, taskTypes, taskSuffixes, isDone, taskCount);
                     System.out.println("Noted. I've removed this task:");
                     System.out.println(deletedTask);
                     String taskWord = taskCount == 1 ? "task" : "tasks";
@@ -129,6 +139,7 @@ public class CatGPT {
                     taskTypes[taskCount] = TaskType.TODO;
                     taskSuffixes[taskCount] = "";
                     taskCount++;
+                    storage.save(tasks, taskTypes, taskSuffixes, isDone, taskCount);
                     System.out.println("Got it. I've added this task:");
                     System.out.println(formatTask(TaskType.TODO, false, description, ""));
                     String taskWord = taskCount == 1 ? "task" : "tasks";
@@ -155,6 +166,7 @@ public class CatGPT {
                     taskTypes[taskCount] = TaskType.DEADLINE;
                     taskSuffixes[taskCount] = suffix;
                     taskCount++;
+                    storage.save(tasks, taskTypes, taskSuffixes, isDone, taskCount);
                     System.out.println("Got it. I've added this task:");
                     System.out.println(formatTask(TaskType.DEADLINE, false, description, suffix));
                     String taskWord = taskCount == 1 ? "task" : "tasks";
@@ -183,6 +195,7 @@ public class CatGPT {
                     taskTypes[taskCount] = TaskType.EVENT;
                     taskSuffixes[taskCount] = suffix;
                     taskCount++;
+                    storage.save(tasks, taskTypes, taskSuffixes, isDone, taskCount);
                     System.out.println("Got it. I've added this task:");
                     System.out.println(formatTask(TaskType.EVENT, false, description, suffix));
                     String taskWord = taskCount == 1 ? "task" : "tasks";
