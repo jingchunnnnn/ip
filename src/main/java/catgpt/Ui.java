@@ -1,3 +1,5 @@
+package catgpt;
+
 import java.util.Scanner;
 
 /**

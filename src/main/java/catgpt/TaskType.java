@@ -1,3 +1,5 @@
+package catgpt;
+
 /**
  * Identifies a task category and its marker in CatGPT's text output.
  */

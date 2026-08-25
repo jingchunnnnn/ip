@@ -1,3 +1,5 @@
+package catgpt;
+
 /**
  * Coordinates CatGPT's user interface, parser, task list, and storage.
  */

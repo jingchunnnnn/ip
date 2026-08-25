@@ -1,3 +1,5 @@
+package catgpt;
+
 /**
  * Represents the common state and behavior of a CatGPT task.
  */

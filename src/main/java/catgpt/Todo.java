@@ -1,3 +1,5 @@
+package catgpt;
+
 /**
  * Represents a task without any associated date or time.
  */

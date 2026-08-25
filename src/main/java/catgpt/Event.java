@@ -1,3 +1,5 @@
+package catgpt;
+
 /**
  * Represents a task that occurs between specified start and end details.
  */
