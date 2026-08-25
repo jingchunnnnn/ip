@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.time.DateTimeException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,17 +27,13 @@ public class Storage {
     }
 
     /**
-     * Loads saved tasks into the supplied task arrays.
+     * Loads saved tasks into the supplied task array.
      *
-     * @param tasks task descriptions to populate
-     * @param taskTypes task types to populate
-     * @param taskSuffixes optional timing details to populate
-     * @param isDone completion states to populate
+     * @param tasks task array to populate
      * @return the number of tasks loaded
      * @throws CatGPTException if the file cannot be read or contains invalid data
      */
-    public int load(String[] tasks, TaskType[] taskTypes, String[] taskSuffixes, boolean[] isDone)
-            throws CatGPTException {
+    public int load(Task[] tasks) throws CatGPTException {
         if (!Files.exists(filePath)) {
             return 0;
         }
@@ -48,7 +45,7 @@ public class Storage {
             }
 
             for (int i = 0; i < lines.size(); i++) {
-                loadTask(lines.get(i), i, tasks, taskTypes, taskSuffixes, isDone);
+                tasks[i] = loadTask(lines.get(i), i);
             }
             return lines.size();
         } catch (IOException error) {
@@ -59,21 +56,17 @@ public class Storage {
     /**
      * Saves all current tasks, creating the data directory and file when necessary.
      *
-     * @param tasks task descriptions to save
-     * @param taskTypes task types to save
-     * @param taskSuffixes optional timing details to save
-     * @param isDone completion states to save
+     * @param tasks tasks to save
      * @param taskCount number of tasks to save
      * @throws CatGPTException if the task data cannot be written
      */
-    public void save(String[] tasks, TaskType[] taskTypes, String[] taskSuffixes,
-                     boolean[] isDone, int taskCount) throws CatGPTException {
+    public void save(Task[] tasks, int taskCount) throws CatGPTException {
         List<String> lines = new ArrayList<>();
         for (int i = 0; i < taskCount; i++) {
-            lines.add(taskTypes[i].name()
-                    + FIELD_SEPARATOR + (isDone[i] ? "1" : "0")
-                    + FIELD_SEPARATOR + encode(tasks[i])
-                    + FIELD_SEPARATOR + encode(taskSuffixes[i]));
+            lines.add(tasks[i].getType().name()
+                    + FIELD_SEPARATOR + (tasks[i].isDone() ? "1" : "0")
+                    + FIELD_SEPARATOR + encode(tasks[i].getDescription())
+                    + FIELD_SEPARATOR + encode(tasks[i].getStorageDetails()));
         }
 
         try {
@@ -88,32 +81,29 @@ public class Storage {
     }
 
     /**
-     * Parses one saved task and places it at the corresponding array index.
+     * Parses one saved task.
      *
      * @param line serialized task data
-     * @param index zero-based destination index and source line number
-     * @param tasks task descriptions to populate
-     * @param taskTypes task types to populate
-     * @param taskSuffixes optional timing details to populate
-     * @param isDone completion states to populate
+     * @param index zero-based source line number
+     * @return the reconstructed task
      * @throws CatGPTException if the serialized task is invalid
      */
-    private void loadTask(String line, int index, String[] tasks, TaskType[] taskTypes,
-                          String[] taskSuffixes, boolean[] isDone) throws CatGPTException {
+    private Task loadTask(String line, int index) throws CatGPTException {
         String[] fields = line.split(FIELD_SEPARATOR_REGEX, -1);
         if (fields.length != FIELD_COUNT) {
             throw corruptedDataException(index);
         }
 
         try {
-            taskTypes[index] = TaskType.valueOf(fields[0]);
+            TaskType taskType = TaskType.valueOf(fields[0]);
             if (!fields[1].equals("0") && !fields[1].equals("1")) {
                 throw corruptedDataException(index);
             }
-            isDone[index] = fields[1].equals("1");
-            tasks[index] = decode(fields[2]);
-            taskSuffixes[index] = decode(fields[3]);
-        } catch (IllegalArgumentException error) {
+            boolean isDone = fields[1].equals("1");
+            String description = decode(fields[2]);
+            String details = decode(fields[3]);
+            return Task.fromStorage(taskType, isDone, description, details);
+        } catch (IllegalArgumentException | DateTimeException error) {
             throw corruptedDataException(index);
         }
     }
