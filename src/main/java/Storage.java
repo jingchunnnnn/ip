@@ -1,8 +1,9 @@
 import java.io.IOException;
-import java.time.DateTimeException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.DateTimeException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -27,27 +28,27 @@ public class Storage {
     }
 
     /**
-     * Loads saved tasks into the supplied task array.
+     * Loads saved tasks from the data file.
      *
-     * @param tasks task array to populate
-     * @return the number of tasks loaded
+     * @return tasks reconstructed from the data file
      * @throws CatGPTException if the file cannot be read or contains invalid data
      */
-    public int load(Task[] tasks) throws CatGPTException {
+    public List<Task> load() throws CatGPTException {
         if (!Files.exists(filePath)) {
-            return 0;
+            return new ArrayList<>();
         }
 
         try {
             List<String> lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
-            if (lines.size() > tasks.length) {
+            if (lines.size() > TaskList.MAX_TASKS) {
                 throw new CatGPTException("The saved task list contains too many tasks.");
             }
 
+            List<Task> tasks = new ArrayList<>();
             for (int i = 0; i < lines.size(); i++) {
-                tasks[i] = loadTask(lines.get(i), i);
+                tasks.add(loadTask(lines.get(i), i));
             }
-            return lines.size();
+            return tasks;
         } catch (IOException error) {
             throw new CatGPTException("I couldn't load tasks from " + filePath + ".");
         }
@@ -57,16 +58,15 @@ public class Storage {
      * Saves all current tasks, creating the data directory and file when necessary.
      *
      * @param tasks tasks to save
-     * @param taskCount number of tasks to save
      * @throws CatGPTException if the task data cannot be written
      */
-    public void save(Task[] tasks, int taskCount) throws CatGPTException {
+    public void save(TaskList tasks) throws CatGPTException {
         List<String> lines = new ArrayList<>();
-        for (int i = 0; i < taskCount; i++) {
-            lines.add(tasks[i].getType().name()
-                    + FIELD_SEPARATOR + (tasks[i].isDone() ? "1" : "0")
-                    + FIELD_SEPARATOR + encode(tasks[i].getDescription())
-                    + FIELD_SEPARATOR + encode(tasks[i].getStorageDetails()));
+        for (Task task : tasks) {
+            lines.add(task.getType().name()
+                    + FIELD_SEPARATOR + (task.isDone() ? "1" : "0")
+                    + FIELD_SEPARATOR + encode(task.getDescription())
+                    + FIELD_SEPARATOR + encode(task.getStorageDetails()));
         }
 
         try {
@@ -102,7 +102,11 @@ public class Storage {
             boolean isDone = fields[1].equals("1");
             String description = decode(fields[2]);
             String details = decode(fields[3]);
-            return Task.fromStorage(taskType, isDone, description, details);
+            return switch (taskType) {
+            case TODO -> new Todo(description, isDone);
+            case DEADLINE -> new Deadline(description, LocalDate.parse(details), isDone);
+            case EVENT -> new Event(description, details, isDone);
+            };
         } catch (IllegalArgumentException | DateTimeException error) {
             throw corruptedDataException(index);
         }

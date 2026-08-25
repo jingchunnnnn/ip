@@ -1,193 +1,122 @@
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
-import java.util.Scanner;
-
 /**
- * Runs the CatGPT task-management chatbot.
+ * Coordinates CatGPT's user interface, parser, task list, and storage.
  */
 public class CatGPT {
-    private static final int MAX_TASKS = 100;
     private static final String DATA_FILE_PATH = "./data/catgpt.txt";
 
-    private CatGPT() {
-    }
+    private final Storage storage;
+    private final Ui ui;
+    private final Parser parser;
+    private TaskList tasks;
 
     /**
-     * Parses and validates the task number supplied to a task-selection command.
+     * Creates CatGPT and loads tasks from the specified data file.
      *
-     * @param input the full user command
-     * @param command the command word to remove before parsing the number
-     * @param taskCount the number of tasks currently stored
-     * @return the zero-based index of the selected task
-     * @throws CatGPTException if the task number is missing, invalid, or outside the task list
+     * @param filePath path of the data file to load and save
      */
-    private static int parseTaskIndex(String input, String command, int taskCount) throws CatGPTException {
-        String argument = input.substring(command.length()).trim();
-        if (argument.isEmpty()) {
-            throw new CatGPTException("Please provide a task number after '" + command + "'.");
-        }
-
-        int taskNumber;
+    public CatGPT(String filePath) {
+        storage = new Storage(filePath);
+        ui = new Ui();
+        parser = new Parser();
         try {
-            taskNumber = Integer.parseInt(argument);
-        } catch (NumberFormatException error) {
-            throw new CatGPTException("The task number must be a whole number.");
+            tasks = new TaskList(storage.load());
+        } catch (CatGPTException error) {
+            ui.showError(error.getMessage());
+            tasks = new TaskList();
         }
-
-        if (taskNumber < 1 || taskNumber > taskCount) {
-            throw new CatGPTException("That task number is not in your list.");
-        }
-        return taskNumber - 1;
     }
 
     /**
-     * Starts CatGPT and processes commands until the user exits.
+     * Processes user commands until the user exits or input ends.
+     */
+    public void run() {
+        ui.showWelcome();
+        while (true) {
+            String input = ui.readCommand();
+            if (input == null) {
+                ui.showGoodbye();
+                break;
+            }
+
+            try {
+                Parser.ParsedCommand command = parser.parse(input);
+                if (execute(command)) {
+                    break;
+                }
+            } catch (CatGPTException error) {
+                ui.showError(error.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Executes one parsed command.
+     *
+     * @param command parsed command to execute
+     * @return {@code true} if CatGPT should exit
+     * @throws CatGPTException if command execution or storage fails
+     */
+    private boolean execute(Parser.ParsedCommand command) throws CatGPTException {
+        switch (command.getType()) {
+        case BYE:
+            ui.showGoodbye();
+            return true;
+        case LIST:
+            ui.showTaskList(tasks);
+            break;
+        case MARK:
+            changeTaskStatus(command, true);
+            break;
+        case UNMARK:
+            changeTaskStatus(command, false);
+            break;
+        case DELETE:
+            deleteTask(command);
+            break;
+        case TODO:
+        case DEADLINE:
+        case EVENT:
+            addTask(command);
+            break;
+        default:
+            throw new IllegalStateException("Unsupported command type");
+        }
+        return false;
+    }
+
+    private void addTask(Parser.ParsedCommand command) throws CatGPTException {
+        Task task = parser.parseTask(command);
+        tasks.add(task);
+        storage.save(tasks);
+        ui.showTaskAdded(task, tasks.size());
+    }
+
+    private void changeTaskStatus(Parser.ParsedCommand command, boolean isDone)
+            throws CatGPTException {
+        int taskIndex = parser.parseTaskIndex(command, tasks.size());
+        Task task = tasks.get(taskIndex);
+        if (isDone) {
+            task.markAsDone();
+        } else {
+            task.markAsNotDone();
+        }
+        storage.save(tasks);
+        ui.showTaskStatusChanged(task, isDone);
+    }
+
+    private void deleteTask(Parser.ParsedCommand command) throws CatGPTException {
+        int taskIndex = parser.parseTaskIndex(command, tasks.size());
+        Task deletedTask = tasks.delete(taskIndex);
+        storage.save(tasks);
+        ui.showTaskDeleted(deletedTask, tasks.size());
+    }
+
+    /**
+     * Starts CatGPT using its default data-file location.
      *
      * @param args command-line arguments, which are not used
      */
     public static void main(String[] args) {
-        String banner = "  ____      _    ____ ____ _____ \n"
-                + " / ___|__ _| |_ / ___|  _ \\_   _|\n"
-                + "| |   / _` | __| |  _| |_) || |  \n"
-                + "| |__| (_| | |_| |_| |  __/ | |  \n"
-                + " \\____\\__,_|\\__|\\____|_|    |_|  \n";
-        System.out.println(banner);
-        System.out.println("Hello! I'm CatGPT.");
-        System.out.println("What can I do for you?");
-        Scanner scanner = new Scanner(System.in);
-        Task[] tasks = new Task[MAX_TASKS];
-        int taskCount = 0;
-        Storage storage = new Storage(DATA_FILE_PATH);
-        try {
-            taskCount = storage.load(tasks);
-        } catch (CatGPTException error) {
-            System.out.println("OOPS!!! " + error.getMessage());
-        }
-
-        while (true) {
-            if (!scanner.hasNextLine()) {
-                System.out.println("Bye. Hope to see you again soon!");
-                break;
-            }
-            String input = scanner.nextLine().trim();
-
-            try {
-                if (input.equals("bye")) {
-                    System.out.println("Bye. Hope to see you again soon!");
-                    break;
-                } else if (input.equals("list")) {
-                    System.out.println("Here are the tasks in your list:");
-                    for (int i = 0; i < taskCount; i++) {
-                        System.out.println((i + 1) + "." + tasks[i]);
-                    }
-                } else if (input.equals("mark") || input.startsWith("mark ")) {
-                    int taskIndex = parseTaskIndex(input, "mark", taskCount);
-                    tasks[taskIndex].markAsDone();
-                    storage.save(tasks, taskCount);
-                    System.out.println("Nice! I've marked this task as done:");
-                    System.out.println(tasks[taskIndex]);
-                } else if (input.equals("unmark") || input.startsWith("unmark ")) {
-                    int taskIndex = parseTaskIndex(input, "unmark", taskCount);
-                    tasks[taskIndex].markAsNotDone();
-                    storage.save(tasks, taskCount);
-                    System.out.println("OK! I've marked this task as not done yet:");
-                    System.out.println(tasks[taskIndex]);
-                } else if (input.equals("delete") || input.startsWith("delete ")) {
-                    int taskIndex = parseTaskIndex(input, "delete", taskCount);
-                    Task deletedTask = tasks[taskIndex];
-                    for (int i = taskIndex; i < taskCount - 1; i++) {
-                        tasks[i] = tasks[i + 1];
-                    }
-                    taskCount--;
-                    tasks[taskCount] = null;
-                    storage.save(tasks, taskCount);
-                    System.out.println("Noted. I've removed this task:");
-                    System.out.println(deletedTask);
-                    String taskWord = taskCount == 1 ? "task" : "tasks";
-                    System.out.println("Now you have " + taskCount + " " + taskWord + " in the list.");
-                } else if (input.equals("todo") || input.startsWith("todo ")) {
-                    String description = input.substring(4).trim();
-                    if (description.isEmpty()) {
-                        throw new CatGPTException("The description of a todo cannot be empty.");
-                    }
-                    if (taskCount >= MAX_TASKS) {
-                        throw new CatGPTException("Your task list is full.");
-                    }
-                    Task task = Task.createTodo(description);
-                    tasks[taskCount] = task;
-                    taskCount++;
-                    storage.save(tasks, taskCount);
-                    System.out.println("Got it. I've added this task:");
-                    System.out.println(task);
-                    String taskWord = taskCount == 1 ? "task" : "tasks";
-                    System.out.println("Now you have " + taskCount + " " + taskWord + " in the list.");
-                } else if (input.equals("deadline") || input.startsWith("deadline ")) {
-                    String body = input.substring(8).trim();
-                    int byIndex = body.indexOf(" /by ");
-                    if (byIndex < 0) {
-                        throw new CatGPTException("Use: deadline DESCRIPTION /by yyyy-MM-dd");
-                    }
-                    String description = body.substring(0, byIndex).trim();
-                    String dateText = body.substring(byIndex + 5).trim();
-                    if (description.isEmpty()) {
-                        throw new CatGPTException("The description of a deadline cannot be empty.");
-                    }
-                    if (dateText.isEmpty()) {
-                        throw new CatGPTException("The deadline date cannot be empty.");
-                    }
-                    if (taskCount >= MAX_TASKS) {
-                        throw new CatGPTException("Your task list is full.");
-                    }
-                    LocalDate deadlineDate;
-                    try {
-                        deadlineDate = LocalDate.parse(dateText);
-                    } catch (DateTimeParseException error) {
-                        throw new CatGPTException(
-                                "The deadline date must use yyyy-MM-dd and be a valid date.");
-                    }
-                    Task task = Task.createDeadline(description, deadlineDate);
-                    tasks[taskCount] = task;
-                    taskCount++;
-                    storage.save(tasks, taskCount);
-                    System.out.println("Got it. I've added this task:");
-                    System.out.println(task);
-                    String taskWord = taskCount == 1 ? "task" : "tasks";
-                    System.out.println("Now you have " + taskCount + " " + taskWord + " in the list.");
-                } else if (input.equals("event") || input.startsWith("event ")) {
-                    String body = input.substring(5).trim();
-                    int fromIndex = body.indexOf(" /from ");
-                    int toIndex = fromIndex < 0 ? -1 : body.indexOf(" /to ", fromIndex + 7);
-                    if (fromIndex < 0 || toIndex < 0) {
-                        throw new CatGPTException("Use: event DESCRIPTION /from START /to END");
-                    }
-                    String description = body.substring(0, fromIndex).trim();
-                    String from = body.substring(fromIndex + 7, toIndex).trim();
-                    String to = body.substring(toIndex + 5).trim();
-                    if (description.isEmpty()) {
-                        throw new CatGPTException("The description of an event cannot be empty.");
-                    }
-                    if (from.isEmpty() || to.isEmpty()) {
-                        throw new CatGPTException("The event start and end times cannot be empty.");
-                    }
-                    if (taskCount >= MAX_TASKS) {
-                        throw new CatGPTException("Your task list is full.");
-                    }
-                    Task task = Task.createEvent(description, from, to);
-                    tasks[taskCount] = task;
-                    taskCount++;
-                    storage.save(tasks, taskCount);
-                    System.out.println("Got it. I've added this task:");
-                    System.out.println(task);
-                    String taskWord = taskCount == 1 ? "task" : "tasks";
-                    System.out.println("Now you have " + taskCount + " " + taskWord + " in the list.");
-                } else if (input.isEmpty()) {
-                    throw new CatGPTException("Please enter a command.");
-                } else {
-                    throw new CatGPTException("I don't know what that means.");
-                }
-            } catch (CatGPTException error) {
-                System.out.println("OOPS!!! " + error.getMessage());
-            }
-        }
+        new CatGPT(DATA_FILE_PATH).run();
     }
 }

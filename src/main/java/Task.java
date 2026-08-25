@@ -1,87 +1,19 @@
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
-
 /**
- * Represents a task and the information needed to display and save it.
+ * Represents the common state and behavior of a CatGPT task.
  */
-public class Task {
-    private static final DateTimeFormatter DISPLAY_DATE_FORMAT =
-            DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
-
-    private final TaskType type;
+public abstract class Task {
     private final String description;
-    private final String suffix;
-    private final LocalDate deadlineDate;
     private boolean isDone;
 
     /**
-     * Creates a task with all its stored state.
+     * Creates a task with its description and completion state.
      *
-     * @param type category of the task
      * @param description task description
-     * @param suffix display details for non-deadline tasks
-     * @param deadlineDate deadline date, or {@code null} for other task types
      * @param isDone whether the task has been completed
      */
-    private Task(TaskType type, String description, String suffix,
-                 LocalDate deadlineDate, boolean isDone) {
-        this.type = type;
+    protected Task(String description, boolean isDone) {
         this.description = description;
-        this.suffix = suffix;
-        this.deadlineDate = deadlineDate;
         this.isDone = isDone;
-    }
-
-    /**
-     * Creates an incomplete todo task.
-     *
-     * @param description task description
-     * @return the new todo task
-     */
-    public static Task createTodo(String description) {
-        return new Task(TaskType.TODO, description, "", null, false);
-    }
-
-    /**
-     * Creates an incomplete deadline task with a typed date.
-     *
-     * @param description task description
-     * @param deadlineDate date by which the task should be completed
-     * @return the new deadline task
-     */
-    public static Task createDeadline(String description, LocalDate deadlineDate) {
-        return new Task(TaskType.DEADLINE, description, "", deadlineDate, false);
-    }
-
-    /**
-     * Creates an incomplete event task.
-     *
-     * @param description task description
-     * @param from event start details
-     * @param to event end details
-     * @return the new event task
-     */
-    public static Task createEvent(String description, String from, String to) {
-        String suffix = " (from: " + from + " to: " + to + ")";
-        return new Task(TaskType.EVENT, description, suffix, null, false);
-    }
-
-    /**
-     * Reconstructs a task from fields stored in the data file.
-     *
-     * @param type stored task type
-     * @param isDone stored completion state
-     * @param description stored task description
-     * @param details stored deadline date or display suffix
-     * @return the reconstructed task
-     */
-    static Task fromStorage(TaskType type, boolean isDone, String description, String details) {
-        return switch (type) {
-        case TODO -> new Task(type, description, "", null, isDone);
-        case DEADLINE -> new Task(type, description, "", LocalDate.parse(details), isDone);
-        case EVENT -> new Task(type, description, details, null, isDone);
-        };
     }
 
     /**
@@ -103,9 +35,7 @@ public class Task {
      *
      * @return the task type
      */
-    public TaskType getType() {
-        return type;
-    }
+    public abstract TaskType getType();
 
     /**
      * Returns whether this task is completed.
@@ -130,9 +60,7 @@ public class Task {
      *
      * @return an ISO deadline date or a display suffix
      */
-    String getStorageDetails() {
-        return type == TaskType.DEADLINE ? deadlineDate.toString() : suffix;
-    }
+    public abstract String getStorageDetails();
 
     /**
      * Formats this task for display to the user.
@@ -142,9 +70,6 @@ public class Task {
     @Override
     public String toString() {
         String status = isDone ? "X" : " ";
-        String displaySuffix = type == TaskType.DEADLINE
-                ? " (by: " + deadlineDate.format(DISPLAY_DATE_FORMAT) + ")"
-                : suffix;
-        return "[" + type.getMarker() + "][" + status + "] " + description + displaySuffix;
+        return "[" + status + "] " + description;
     }
 }
