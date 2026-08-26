@@ -9,7 +9,7 @@ public class CatGPTException extends Exception {
     /**
      * Creates an exception with a user-friendly explanation of the error.
      *
-     * @param message the explanation shown to the user
+     * @param message The explanation shown to the user.
      */
     public CatGPTException(String message) {
         super(message);

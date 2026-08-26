@@ -13,7 +13,9 @@ public class TaskList implements Iterable<Task> {
 
     private final List<Task> tasks;
 
-    /** Creates an empty task list. */
+    /**
+     * Creates an empty task list.
+     */
     public TaskList() {
         tasks = new ArrayList<>();
     }
@@ -21,7 +23,7 @@ public class TaskList implements Iterable<Task> {
     /**
      * Creates a task list containing tasks loaded from storage.
      *
-     * @param tasks tasks with which to initialize the list
+     * @param tasks Tasks with which to initialize the list.
      */
     public TaskList(List<Task> tasks) {
         if (tasks.size() > MAX_TASKS) {
@@ -33,8 +35,8 @@ public class TaskList implements Iterable<Task> {
     /**
      * Adds a task to the end of the list.
      *
-     * @param task task to add
-     * @throws CatGPTException if the task list is full
+     * @param task Task to add.
+     * @throws CatGPTException If the task list is full.
      */
     public void add(Task task) throws CatGPTException {
         if (tasks.size() >= MAX_TASKS) {
@@ -46,8 +48,8 @@ public class TaskList implements Iterable<Task> {
     /**
      * Returns the task at a zero-based index.
      *
-     * @param index zero-based task index
-     * @return the selected task
+     * @param index Zero-based task index.
+     * @return The selected task.
      */
     public Task get(int index) {
         return tasks.get(index);
@@ -56,8 +58,8 @@ public class TaskList implements Iterable<Task> {
     /**
      * Removes and returns the task at a zero-based index.
      *
-     * @param index zero-based task index
-     * @return the removed task
+     * @param index Zero-based task index.
+     * @return The removed task.
      */
     public Task delete(int index) {
         return tasks.remove(index);
@@ -66,7 +68,7 @@ public class TaskList implements Iterable<Task> {
     /**
      * Returns the number of tasks in the list.
      *
-     * @return task count
+     * @return Task count.
      */
     public int size() {
         return tasks.size();
@@ -75,7 +77,7 @@ public class TaskList implements Iterable<Task> {
     /**
      * Returns an iterator over the tasks in list order.
      *
-     * @return task iterator
+     * @return Task iterator.
      */
     @Override
     public Iterator<Task> iterator() {

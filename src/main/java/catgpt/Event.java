@@ -9,9 +9,9 @@ public class Event extends Task {
     /**
      * Creates an incomplete event task.
      *
-     * @param description task description
-     * @param from event start details
-     * @param to event end details
+     * @param description Task description.
+     * @param from Event start details.
+     * @param to Event end details.
      */
     public Event(String description, String from, String to) {
         this(description, " (from: " + from + " to: " + to + ")", false);
@@ -20,9 +20,9 @@ public class Event extends Task {
     /**
      * Reconstructs an event task from its stored timing details.
      *
-     * @param description task description
-     * @param timingDetails formatted event timing details
-     * @param isDone whether the task has been completed
+     * @param description Task description.
+     * @param timingDetails Formatted event timing details.
+     * @param isDone Whether the task has been completed.
      */
     Event(String description, String timingDetails, boolean isDone) {
         super(description, isDone);

@@ -14,12 +14,16 @@ public class Ui {
 
     private final Scanner scanner;
 
-    /** Creates a console UI that reads from standard input. */
+    /**
+     * Creates a console UI that reads from standard input.
+     */
     public Ui() {
         scanner = new Scanner(System.in);
     }
 
-    /** Displays CatGPT's banner and greeting. */
+    /**
+     * Displays CatGPT's banner and greeting.
+     */
     public void showWelcome() {
         System.out.println(BANNER);
         System.out.println("Hello! I'm CatGPT.");
@@ -29,13 +33,15 @@ public class Ui {
     /**
      * Reads the next command, or returns {@code null} when input ends.
      *
-     * @return next command, or {@code null} at end of input
+     * @return Next command, or {@code null} at end of input.
      */
     public String readCommand() {
         return scanner.hasNextLine() ? scanner.nextLine() : null;
     }
 
-    /** Displays CatGPT's farewell message. */
+    /**
+     * Displays CatGPT's farewell message.
+     */
     public void showGoodbye() {
         System.out.println("Bye. Hope to see you again soon!");
     }
@@ -43,7 +49,7 @@ public class Ui {
     /**
      * Displays a user-friendly error message.
      *
-     * @param message explanation of the error
+     * @param message Explanation of the error.
      */
     public void showError(String message) {
         System.out.println("OOPS!!! " + message);
@@ -52,7 +58,7 @@ public class Ui {
     /**
      * Displays all tasks with one-based numbering.
      *
-     * @param tasks tasks to display
+     * @param tasks Tasks to display.
      */
     public void showTaskList(TaskList tasks) {
         System.out.println("Here are the tasks in your list:");
@@ -66,8 +72,8 @@ public class Ui {
     /**
      * Displays confirmation that a task was added.
      *
-     * @param task added task
-     * @param taskCount resulting number of tasks
+     * @param task Added task.
+     * @param taskCount Resulting number of tasks.
      */
     public void showTaskAdded(Task task, int taskCount) {
         System.out.println("Got it. I've added this task:");
@@ -78,8 +84,8 @@ public class Ui {
     /**
      * Displays confirmation that a task was deleted.
      *
-     * @param task deleted task
-     * @param taskCount resulting number of tasks
+     * @param task Deleted task.
+     * @param taskCount Resulting number of tasks.
      */
     public void showTaskDeleted(Task task, int taskCount) {
         System.out.println("Noted. I've removed this task:");
@@ -90,8 +96,8 @@ public class Ui {
     /**
      * Displays confirmation of a task status change.
      *
-     * @param task updated task
-     * @param isDone whether the task was marked completed
+     * @param task Updated task.
+     * @param isDone Whether the task was marked completed.
      */
     public void showTaskStatusChanged(Task task, boolean isDone) {
         String message = isDone
