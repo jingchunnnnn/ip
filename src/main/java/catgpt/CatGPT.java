@@ -14,7 +14,7 @@ public class CatGPT {
     /**
      * Creates CatGPT and loads tasks from the specified data file.
      *
-     * @param filePath path of the data file to load and save
+     * @param filePath Path of the data file to load and save.
      */
     public CatGPT(String filePath) {
         storage = new Storage(filePath);
@@ -54,34 +54,34 @@ public class CatGPT {
     /**
      * Executes one parsed command.
      *
-     * @param command parsed command to execute
-     * @return {@code true} if CatGPT should exit
-     * @throws CatGPTException if command execution or storage fails
+     * @param command Parsed command to execute.
+     * @return {@code true} if CatGPT should exit.
+     * @throws CatGPTException If command execution or storage fails.
      */
     private boolean execute(Parser.ParsedCommand command) throws CatGPTException {
         switch (command.getType()) {
-        case BYE:
-            ui.showGoodbye();
-            return true;
-        case LIST:
-            ui.showTaskList(tasks);
-            break;
-        case MARK:
-            changeTaskStatus(command, true);
-            break;
-        case UNMARK:
-            changeTaskStatus(command, false);
-            break;
-        case DELETE:
-            deleteTask(command);
-            break;
-        case TODO:
-        case DEADLINE:
-        case EVENT:
-            addTask(command);
-            break;
-        default:
-            throw new IllegalStateException("Unsupported command type");
+            case BYE:
+                ui.showGoodbye();
+                return true;
+            case LIST:
+                ui.showTaskList(tasks);
+                break;
+            case MARK:
+                changeTaskStatus(command, true);
+                break;
+            case UNMARK:
+                changeTaskStatus(command, false);
+                break;
+            case DELETE:
+                deleteTask(command);
+                break;
+            case TODO:
+            case DEADLINE:
+            case EVENT:
+                addTask(command);
+                break;
+            default:
+                throw new IllegalStateException("Unsupported command type");
         }
         return false;
     }
@@ -116,7 +116,7 @@ public class CatGPT {
     /**
      * Starts CatGPT using its default data-file location.
      *
-     * @param args command-line arguments, which are not used
+     * @param args Command-line arguments, which are not used.
      */
     public static void main(String[] args) {
         new CatGPT(DATA_FILE_PATH).run();

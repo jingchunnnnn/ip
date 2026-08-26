@@ -8,7 +8,9 @@ import java.util.Locale;
  * Interprets user input and validates command arguments.
  */
 public class Parser {
-    /** Creates a parser for CatGPT commands. */
+    /**
+     * Creates a parser for CatGPT commands.
+     */
     public Parser() {
     }
 
@@ -45,7 +47,7 @@ public class Parser {
         /**
          * Returns the recognized command type.
          *
-         * @return command type
+         * @return Command type.
          */
         public CommandType getType() {
             return type;
@@ -54,7 +56,7 @@ public class Parser {
         /**
          * Returns the text following the command word.
          *
-         * @return command arguments
+         * @return Command arguments.
          */
         public String getArguments() {
             return arguments;
@@ -64,9 +66,9 @@ public class Parser {
     /**
      * Recognizes the command word and separates it from its arguments.
      *
-     * @param input full user input
-     * @return parsed command
-     * @throws CatGPTException if the command is empty or unknown
+     * @param input Full user input.
+     * @return Parsed command.
+     * @throws CatGPTException If the command is empty or unknown.
      */
     public ParsedCommand parse(String input) throws CatGPTException {
         String trimmedInput = input.trim();
@@ -91,10 +93,10 @@ public class Parser {
     /**
      * Parses and validates the task number in a task-selection command.
      *
-     * @param command parsed command containing a task number
-     * @param taskCount current number of tasks
-     * @return zero-based index of the selected task
-     * @throws CatGPTException if the task number is missing, invalid, or out of range
+     * @param command Parsed command containing a task number.
+     * @param taskCount Current number of tasks.
+     * @return Zero-based index of the selected task.
+     * @throws CatGPTException If the task number is missing, invalid, or out of range.
      */
     public int parseTaskIndex(ParsedCommand command, int taskCount) throws CatGPTException {
         String arguments = command.getArguments();
@@ -118,16 +120,16 @@ public class Parser {
     /**
      * Creates a task from an add command after validating its arguments.
      *
-     * @param command parsed todo, deadline, or event command
-     * @return task represented by the command
-     * @throws CatGPTException if required task details are missing or invalid
+     * @param command Parsed todo, deadline, or event command.
+     * @return Task represented by the command.
+     * @throws CatGPTException If required task details are missing or invalid.
      */
     public Task parseTask(ParsedCommand command) throws CatGPTException {
         return switch (command.getType()) {
-        case TODO -> parseTodo(command.getArguments());
-        case DEADLINE -> parseDeadline(command.getArguments());
-        case EVENT -> parseEvent(command.getArguments());
-        default -> throw new IllegalArgumentException("Not an add command");
+            case TODO -> parseTodo(command.getArguments());
+            case DEADLINE -> parseDeadline(command.getArguments());
+            case EVENT -> parseEvent(command.getArguments());
+            default -> throw new IllegalArgumentException("Not an add command");
         };
     }
 

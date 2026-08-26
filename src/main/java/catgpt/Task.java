@@ -10,8 +10,8 @@ public abstract class Task {
     /**
      * Creates a task with its description and completion state.
      *
-     * @param description task description
-     * @param isDone whether the task has been completed
+     * @param description Task description.
+     * @param isDone Whether the task has been completed.
      */
     protected Task(String description, boolean isDone) {
         this.description = description;
@@ -35,14 +35,14 @@ public abstract class Task {
     /**
      * Returns this task's category.
      *
-     * @return the task type
+     * @return The task type.
      */
     public abstract TaskType getType();
 
     /**
      * Returns whether this task is completed.
      *
-     * @return {@code true} if the task is completed
+     * @return {@code true} if the task is completed.
      */
     public boolean isDone() {
         return isDone;
@@ -51,7 +51,7 @@ public abstract class Task {
     /**
      * Returns this task's description.
      *
-     * @return the task description
+     * @return The task description.
      */
     public String getDescription() {
         return description;
@@ -60,14 +60,14 @@ public abstract class Task {
     /**
      * Returns task-type-specific details in their storage representation.
      *
-     * @return an ISO deadline date or a display suffix
+     * @return An ISO deadline date or a display suffix.
      */
     public abstract String getStorageDetails();
 
     /**
      * Formats this task for display to the user.
      *
-     * @return the formatted task
+     * @return The formatted task.
      */
     @Override
     public String toString() {

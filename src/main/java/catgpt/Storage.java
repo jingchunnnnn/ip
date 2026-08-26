@@ -23,7 +23,7 @@ public class Storage {
     /**
      * Creates storage backed by the specified file path.
      *
-     * @param filePath path to the task data file
+     * @param filePath Path to the task data file.
      */
     public Storage(String filePath) {
         this.filePath = Path.of(filePath);
@@ -32,8 +32,8 @@ public class Storage {
     /**
      * Loads saved tasks from the data file.
      *
-     * @return tasks reconstructed from the data file
-     * @throws CatGPTException if the file cannot be read or contains invalid data
+     * @return Tasks reconstructed from the data file.
+     * @throws CatGPTException If the file cannot be read or contains invalid data.
      */
     public List<Task> load() throws CatGPTException {
         if (!Files.exists(filePath)) {
@@ -59,8 +59,8 @@ public class Storage {
     /**
      * Saves all current tasks, creating the data directory and file when necessary.
      *
-     * @param tasks tasks to save
-     * @throws CatGPTException if the task data cannot be written
+     * @param tasks Tasks to save.
+     * @throws CatGPTException If the task data cannot be written.
      */
     public void save(TaskList tasks) throws CatGPTException {
         List<String> lines = new ArrayList<>();
@@ -85,10 +85,10 @@ public class Storage {
     /**
      * Parses one saved task.
      *
-     * @param line serialized task data
-     * @param index zero-based source line number
-     * @return the reconstructed task
-     * @throws CatGPTException if the serialized task is invalid
+     * @param line Serialized task data.
+     * @param index Zero-based source line number.
+     * @return The reconstructed task.
+     * @throws CatGPTException If the serialized task is invalid.
      */
     private Task loadTask(String line, int index) throws CatGPTException {
         String[] fields = line.split(FIELD_SEPARATOR_REGEX, -1);
@@ -105,9 +105,9 @@ public class Storage {
             String description = decode(fields[2]);
             String details = decode(fields[3]);
             return switch (taskType) {
-            case TODO -> new Todo(description, isDone);
-            case DEADLINE -> new Deadline(description, LocalDate.parse(details), isDone);
-            case EVENT -> new Event(description, details, isDone);
+                case TODO -> new Todo(description, isDone);
+                case DEADLINE -> new Deadline(description, LocalDate.parse(details), isDone);
+                case EVENT -> new Event(description, details, isDone);
             };
         } catch (IllegalArgumentException | DateTimeException error) {
             throw corruptedDataException(index);
@@ -117,8 +117,8 @@ public class Storage {
     /**
      * Encodes task text so separators inside user input cannot corrupt the data format.
      *
-     * @param value text to encode
-     * @return Base64-encoded text
+     * @param value Text to encode.
+     * @return Base64-encoded text.
      */
     private String encode(String value) {
         return Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8));
@@ -127,8 +127,8 @@ public class Storage {
     /**
      * Decodes text previously written by {@link #encode(String)}.
      *
-     * @param value Base64-encoded text
-     * @return decoded text
+     * @param value Base64-encoded text.
+     * @return Decoded text.
      */
     private String decode(String value) {
         byte[] decodedBytes = Base64.getDecoder().decode(value);
@@ -138,8 +138,8 @@ public class Storage {
     /**
      * Creates a user-friendly error identifying a corrupted data-file line.
      *
-     * @param index zero-based line index
-     * @return the corruption error
+     * @param index Zero-based line index.
+     * @return The corruption error.
      */
     private CatGPTException corruptedDataException(int index) {
         return new CatGPTException("The saved task data is corrupted at line " + (index + 1) + ".");
