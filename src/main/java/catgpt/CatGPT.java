@@ -75,6 +75,9 @@ public class CatGPT {
         case DELETE:
             deleteTask(command);
             break;
+        case FIND:
+            findTasks(command);
+            break;
         case TODO:
         case DEADLINE:
         case EVENT:
@@ -111,6 +114,12 @@ public class CatGPT {
         Task deletedTask = tasks.delete(taskIndex);
         storage.save(tasks);
         ui.showTaskDeleted(deletedTask, tasks.size());
+    }
+
+    private void findTasks(Parser.ParsedCommand command) throws CatGPTException {
+        String keyword = parser.parseKeyword(command);
+        TaskList matchingTasks = tasks.find(keyword);
+        ui.showMatchingTasks(matchingTasks);
     }
 
     /**
