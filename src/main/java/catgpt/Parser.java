@@ -26,6 +26,8 @@ public class Parser {
         UNMARK,
         /** Removes a task. */
         DELETE,
+        /** Finds tasks containing a keyword. */
+        FIND,
         /** Adds a todo task. */
         TODO,
         /** Adds a deadline task. */
@@ -115,6 +117,21 @@ public class Parser {
             throw new CatGPTException("That task number is not in your list.");
         }
         return taskNumber - 1;
+    }
+
+    /**
+     * Returns the keyword supplied to a find command.
+     *
+     * @param command Parsed find command.
+     * @return Keyword to search for.
+     * @throws CatGPTException If the keyword is missing.
+     */
+    public String parseKeyword(ParsedCommand command) throws CatGPTException {
+        String keyword = command.getArguments();
+        if (keyword.isEmpty()) {
+            throw new CatGPTException("Please provide a keyword after 'find'.");
+        }
+        return keyword;
     }
 
     /**

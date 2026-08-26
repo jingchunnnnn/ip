@@ -49,4 +49,13 @@ class ParserTest {
                 CatGPTException.class, () -> parser.parseTaskIndex(command, 2));
         assertEquals("That task number is not in your list.", exception.getMessage());
     }
+
+    @Test
+    void parseKeywordMissingKeywordThrowsException() throws CatGPTException {
+        Parser.ParsedCommand command = parser.parse("find");
+
+        CatGPTException exception = assertThrows(
+                CatGPTException.class, () -> parser.parseKeyword(command));
+        assertEquals("Please provide a keyword after 'find'.", exception.getMessage());
+    }
 }

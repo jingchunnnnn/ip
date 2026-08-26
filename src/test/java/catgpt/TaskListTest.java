@@ -44,4 +44,18 @@ class TaskListTest {
 
         assertEquals("[T][X] read book", tasks.get(0).toString());
     }
+
+    @Test
+    void findMatchingKeywordReturnsOnlyMatchingTasks() {
+        Task firstMatch = new Todo("read book");
+        Task nonMatch = new Todo("write notes");
+        Task secondMatch = new Todo("return book");
+        TaskList tasks = new TaskList(List.of(firstMatch, nonMatch, secondMatch));
+
+        TaskList matchingTasks = tasks.find("book");
+
+        assertEquals(2, matchingTasks.size());
+        assertSame(firstMatch, matchingTasks.get(0));
+        assertSame(secondMatch, matchingTasks.get(1));
+    }
 }
