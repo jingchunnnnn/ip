@@ -1,0 +1,45 @@
+.root {
+    -fx-background-color: #f4f1ea;
+    -fx-font-family: "Avenir Next", "Arial", sans-serif;
+}
+
+.scroll-pane,
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.label {
+    -fx-font-size: 14px;
+}
+
+.dialog-box .dialog {
+    -fx-background-radius: 14px;
+    -fx-padding: 10px 14px;
+}
+
+.user-dialog .dialog {
+    -fx-background-color: #dcecff;
+}
+
+.cat-dialog .dialog {
+    -fx-background-color: #fff4cf;
+}
+
+.dialog-box .avatar {
+    -fx-background-color: #24313d;
+    -fx-background-radius: 26px;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.text-field {
+    -fx-background-radius: 10px;
+    -fx-padding: 9px 12px;
+}
+
+.button {
+    -fx-background-color: #24313d;
+    -fx-background-radius: 10px;
+    -fx-text-fill: white;
+}

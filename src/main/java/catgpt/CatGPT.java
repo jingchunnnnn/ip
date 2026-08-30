@@ -12,6 +12,13 @@ public class CatGPT {
     private TaskList tasks;
 
     /**
+     * Creates CatGPT using its default data-file location.
+     */
+    public CatGPT() {
+        this(DATA_FILE_PATH);
+    }
+
+    /**
      * Creates CatGPT and loads tasks from the specified data file.
      *
      * @param filePath Path of the data file to load and save.
@@ -42,7 +49,8 @@ public class CatGPT {
 
             try {
                 Parser.ParsedCommand command = parser.parse(input);
-                if (execute(command)) {
+                ui.showResponse(execute(command));
+                if (command.getType() == Parser.CommandType.BYE) {
                     break;
                 }
             } catch (CatGPTException error) {
@@ -52,51 +60,55 @@ public class CatGPT {
     }
 
     /**
+     * Processes one user command and returns the response for a graphical UI.
+     *
+     * @param input User command to process.
+     * @return User-facing response to the command.
+     */
+    public String getResponse(String input) {
+        try {
+            return execute(parser.parse(input));
+        } catch (CatGPTException error) {
+            return ui.formatError(error.getMessage());
+        }
+    }
+
+    /**
+     * Returns CatGPT's greeting for a graphical UI.
+     *
+     * @return Greeting shown when the application starts.
+     */
+    public String getWelcomeMessage() {
+        return ui.getWelcomeMessage();
+    }
+
+    /**
      * Executes one parsed command.
      *
      * @param command Parsed command to execute.
-     * @return {@code true} if CatGPT should exit.
+     * @return User-facing response to the command.
      * @throws CatGPTException If command execution or storage fails.
      */
-    private boolean execute(Parser.ParsedCommand command) throws CatGPTException {
-        switch (command.getType()) {
-            case BYE:
-                ui.showGoodbye();
-                return true;
-            case LIST:
-                ui.showTaskList(tasks);
-                break;
-            case MARK:
-                changeTaskStatus(command, true);
-                break;
-            case UNMARK:
-                changeTaskStatus(command, false);
-                break;
-            case DELETE:
-                deleteTask(command);
-                break;
-            case FIND:
-                findTasks(command);
-                break;
-            case TODO:
-            case DEADLINE:
-            case EVENT:
-                addTask(command);
-                break;
-            default:
-                throw new IllegalStateException("Unsupported command type");
-        }
-        return false;
+    private String execute(Parser.ParsedCommand command) throws CatGPTException {
+        return switch (command.getType()) {
+            case BYE -> ui.getGoodbyeMessage();
+            case LIST -> ui.formatTaskList(tasks);
+            case MARK -> changeTaskStatus(command, true);
+            case UNMARK -> changeTaskStatus(command, false);
+            case DELETE -> deleteTask(command);
+            case FIND -> findTasks(command);
+            case TODO, DEADLINE, EVENT -> addTask(command);
+        };
     }
 
-    private void addTask(Parser.ParsedCommand command) throws CatGPTException {
+    private String addTask(Parser.ParsedCommand command) throws CatGPTException {
         Task task = parser.parseTask(command);
         tasks.add(task);
         storage.save(tasks);
-        ui.showTaskAdded(task, tasks.size());
+        return ui.formatTaskAdded(task, tasks.size());
     }
 
-    private void changeTaskStatus(Parser.ParsedCommand command, boolean isDone)
+    private String changeTaskStatus(Parser.ParsedCommand command, boolean isDone)
             throws CatGPTException {
         int taskIndex = parser.parseTaskIndex(command, tasks.size());
         Task task = tasks.get(taskIndex);
@@ -106,20 +118,20 @@ public class CatGPT {
             task.markAsNotDone();
         }
         storage.save(tasks);
-        ui.showTaskStatusChanged(task, isDone);
+        return ui.formatTaskStatusChanged(task, isDone);
     }
 
-    private void deleteTask(Parser.ParsedCommand command) throws CatGPTException {
+    private String deleteTask(Parser.ParsedCommand command) throws CatGPTException {
         int taskIndex = parser.parseTaskIndex(command, tasks.size());
         Task deletedTask = tasks.delete(taskIndex);
         storage.save(tasks);
-        ui.showTaskDeleted(deletedTask, tasks.size());
+        return ui.formatTaskDeleted(deletedTask, tasks.size());
     }
 
-    private void findTasks(Parser.ParsedCommand command) throws CatGPTException {
+    private String findTasks(Parser.ParsedCommand command) throws CatGPTException {
         String keyword = parser.parseKeyword(command);
         TaskList matchingTasks = tasks.find(keyword);
-        ui.showMatchingTasks(matchingTasks);
+        return ui.formatMatchingTasks(matchingTasks);
     }
 
     /**
