@@ -69,7 +69,7 @@ public class Ui {
      * @return Greeting for the user.
      */
     public String getWelcomeMessage() {
-        return "Hello! I'm CatGPT.\nWhat can I do for you?";
+        return formatLines("Hello! I'm CatGPT.", "What can I do for you?");
     }
 
     /**
@@ -131,7 +131,10 @@ public class Ui {
      * @return Formatted confirmation.
      */
     public String formatTaskAdded(Task task, int taskCount) {
-        return "Got it. I've added this task:\n" + task + "\n" + formatTaskCount(taskCount);
+        return formatLines(
+                "Got it. I've added this task:",
+                task.toString(),
+                formatTaskCount(taskCount));
     }
 
     /**
@@ -142,7 +145,10 @@ public class Ui {
      * @return Formatted confirmation.
      */
     public String formatTaskDeleted(Task task, int taskCount) {
-        return "Noted. I've removed this task:\n" + task + "\n" + formatTaskCount(taskCount);
+        return formatLines(
+                "Noted. I've removed this task:",
+                task.toString(),
+                formatTaskCount(taskCount));
     }
 
     /**
@@ -156,7 +162,17 @@ public class Ui {
         String message = isDone
                 ? "Nice! I've marked this task as done:"
                 : "OK! I've marked this task as not done yet:";
-        return message + "\n" + task;
+        return formatLines(message, task.toString());
+    }
+
+    /**
+     * Joins a variable number of response lines using the platform line separator.
+     *
+     * @param lines Response lines to join.
+     * @return Lines formatted as one response.
+     */
+    private String formatLines(String... lines) {
+        return String.join(System.lineSeparator(), lines);
     }
 
     private String formatTaskCount(int taskCount) {
