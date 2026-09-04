@@ -98,13 +98,7 @@ public class Ui {
      * @return Formatted task list.
      */
     public String formatTaskList(TaskList tasks) {
-        StringBuilder response = new StringBuilder("Here are the tasks in your list:");
-        int taskNumber = 1;
-        for (Task task : tasks) {
-            response.append(System.lineSeparator()).append(taskNumber).append('.').append(task);
-            taskNumber++;
-        }
-        return response.toString();
+        return formatNumberedTasks("Here are the tasks in your list:", tasks);
     }
 
     /**
@@ -114,7 +108,18 @@ public class Ui {
      * @return Formatted matching tasks.
      */
     public String formatMatchingTasks(TaskList tasks) {
-        StringBuilder response = new StringBuilder("Here are the matching tasks in your list:");
+        return formatNumberedTasks("Here are the matching tasks in your list:", tasks);
+    }
+
+    /**
+     * Formats a heading followed by one-based, numbered tasks.
+     *
+     * @param heading Heading placed before the tasks.
+     * @param tasks Tasks to display.
+     * @return Heading and numbered tasks.
+     */
+    private String formatNumberedTasks(String heading, TaskList tasks) {
+        StringBuilder response = new StringBuilder(heading);
         int taskNumber = 1;
         for (Task task : tasks) {
             response.append(System.lineSeparator()).append(taskNumber).append('.').append(task);
