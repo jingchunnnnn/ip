@@ -2,6 +2,7 @@ package catgpt;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 
@@ -11,6 +12,13 @@ import org.junit.jupiter.api.Test;
  * Tests task collection operations in {@link TaskList}.
  */
 class TaskListTest {
+    @Test
+    void addNullTaskViolatesInternalInvariant() {
+        TaskList tasks = new TaskList();
+
+        assertThrows(AssertionError.class, () -> tasks.add(null));
+    }
+
     @Test
     void addTaskStoresTaskAtEnd() throws CatGPTException {
         TaskList tasks = new TaskList();

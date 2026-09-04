@@ -90,6 +90,7 @@ public class CatGPT {
      * @throws CatGPTException If command execution or storage fails.
      */
     private String execute(Parser.ParsedCommand command) throws CatGPTException {
+        assert command != null : "Command must be parsed before execution";
         return switch (command.getType()) {
             case BYE -> ui.getGoodbyeMessage();
             case LIST -> ui.formatTaskList(tasks);
