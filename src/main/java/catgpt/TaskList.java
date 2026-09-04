@@ -39,6 +39,7 @@ public class TaskList implements Iterable<Task> {
      * @throws CatGPTException If the task list is full.
      */
     public void add(Task task) throws CatGPTException {
+        assert task != null : "Task list cannot contain null tasks";
         if (tasks.size() >= MAX_TASKS) {
             throw new CatGPTException("Your task list is full.");
         }

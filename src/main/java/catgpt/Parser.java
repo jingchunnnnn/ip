@@ -116,6 +116,8 @@ public class Parser {
         if (taskNumber < 1 || taskNumber > taskCount) {
             throw new CatGPTException("That task number is not in your list.");
         }
+        assert taskNumber >= 1 && taskNumber <= taskCount
+                : "Validated task number must be within the task list";
         return taskNumber - 1;
     }
 
