@@ -82,12 +82,9 @@ public class TaskList implements Iterable<Task> {
      * @return Matching tasks in their original order.
      */
     public TaskList find(String keyword) {
-        List<Task> matchingTasks = new ArrayList<>();
-        for (Task task : tasks) {
-            if (task.getDescription().contains(keyword)) {
-                matchingTasks.add(task);
-            }
-        }
+        List<Task> matchingTasks = tasks.stream()
+                .filter(task -> task.getDescription().contains(keyword))
+                .toList();
         return new TaskList(matchingTasks);
     }
 
