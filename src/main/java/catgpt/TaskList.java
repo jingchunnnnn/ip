@@ -1,6 +1,7 @@
 package catgpt;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -86,6 +87,14 @@ public class TaskList implements Iterable<Task> {
                 .filter(task -> task.getDescription().contains(keyword))
                 .toList();
         return new TaskList(matchingTasks);
+    }
+
+    /**
+     * Sorts tasks alphabetically by description, ignoring letter case.
+     * Tasks with equal descriptions retain their existing relative order.
+     */
+    public void sortByDescription() {
+        tasks.sort(Comparator.comparing(Task::getDescription, String.CASE_INSENSITIVE_ORDER));
     }
 
     /**

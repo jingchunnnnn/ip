@@ -98,6 +98,7 @@ public class CatGPT {
             case UNMARK -> changeTaskStatus(command, false);
             case DELETE -> deleteTask(command);
             case FIND -> findTasks(command);
+            case SORT -> sortTasks();
             case TODO, DEADLINE, EVENT -> addTask(command);
         };
     }
@@ -133,6 +134,12 @@ public class CatGPT {
         String keyword = parser.parseKeyword(command);
         TaskList matchingTasks = tasks.find(keyword);
         return ui.formatMatchingTasks(matchingTasks);
+    }
+
+    private String sortTasks() throws CatGPTException {
+        tasks.sortByDescription();
+        storage.save(tasks);
+        return ui.formatSortedTaskList(tasks);
     }
 
     /**

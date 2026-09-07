@@ -32,4 +32,21 @@ public class CatGPTTest {
 
         assertEquals("OOPS!!! I don't know what that means.", chatbot.getResponse("meow"));
     }
+
+    @Test
+    public void getResponseSortCommandSortsAndPersistsTasks() {
+        Path dataFile = temporaryDirectory.resolve("tasks.txt");
+        CatGPT chatbot = new CatGPT(dataFile.toString());
+        chatbot.getResponse("todo write report");
+        chatbot.getResponse("todo attend meeting");
+
+        String sortResponse = chatbot.getResponse("sort");
+        CatGPT reloadedChatbot = new CatGPT(dataFile.toString());
+
+        assertTrue(sortResponse.contains("1.[T][ ] attend meeting"));
+        assertTrue(sortResponse.contains("2.[T][ ] write report"));
+        assertTrue(reloadedChatbot.getResponse("list").contains(
+                "1.[T][ ] attend meeting" + System.lineSeparator()
+                        + "2.[T][ ] write report"));
+    }
 }

@@ -21,6 +21,22 @@ class ParserTest {
     }
 
     @Test
+    void parseSortCommandWithoutArgumentsReturnsSortType() throws CatGPTException {
+        Parser.ParsedCommand command = parser.parse("sort");
+
+        assertEquals(Parser.CommandType.SORT, command.getType());
+        assertEquals("", command.getArguments());
+    }
+
+    @Test
+    void parseSortCommandWithArgumentsThrowsException() {
+        CatGPTException exception = assertThrows(
+                CatGPTException.class, () -> parser.parse("sort deadline"));
+
+        assertEquals("I don't know what that means.", exception.getMessage());
+    }
+
+    @Test
     void parseTaskValidDeadlineReturnsDeadline() throws CatGPTException {
         Parser.ParsedCommand command = parser.parse("deadline return book /by 2028-02-29");
 

@@ -66,4 +66,30 @@ class TaskListTest {
         assertSame(firstMatch, matchingTasks.get(0));
         assertSame(secondMatch, matchingTasks.get(1));
     }
+
+    @Test
+    void sortByDescriptionOrdersTasksAlphabeticallyIgnoringCase() {
+        Task firstAlphaMatch = new Todo("Write report");
+        Task secondAlphaMatch = new Todo("write slides");
+        Task earliestTask = new Todo("attend meeting");
+        TaskList tasks = new TaskList(List.of(firstAlphaMatch, secondAlphaMatch, earliestTask));
+
+        tasks.sortByDescription();
+
+        assertSame(earliestTask, tasks.get(0));
+        assertSame(firstAlphaMatch, tasks.get(1));
+        assertSame(secondAlphaMatch, tasks.get(2));
+    }
+
+    @Test
+    void sortByDescriptionEqualDescriptionsPreserveExistingOrder() {
+        Task firstTask = new Todo("Read book");
+        Task secondTask = new Deadline("read book", java.time.LocalDate.of(2026, 9, 30));
+        TaskList tasks = new TaskList(List.of(firstTask, secondTask));
+
+        tasks.sortByDescription();
+
+        assertSame(firstTask, tasks.get(0));
+        assertSame(secondTask, tasks.get(1));
+    }
 }
