@@ -28,6 +28,8 @@ public class Parser {
         DELETE,
         /** Finds tasks containing a keyword. */
         FIND,
+        /** Sorts tasks alphabetically by description. */
+        SORT,
         /** Adds a todo task. */
         TODO,
         /** Adds a deadline task. */
@@ -83,7 +85,10 @@ public class Parser {
         String arguments = parts.length == 2 ? parts[1].trim() : "";
         try {
             CommandType type = CommandType.valueOf(commandWord);
-            if ((type == CommandType.BYE || type == CommandType.LIST) && !arguments.isEmpty()) {
+            if ((type == CommandType.BYE
+                    || type == CommandType.LIST
+                    || type == CommandType.SORT)
+                    && !arguments.isEmpty()) {
                 throw new CatGPTException("I don't know what that means.");
             }
             return new ParsedCommand(type, arguments);

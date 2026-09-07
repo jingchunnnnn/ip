@@ -20,9 +20,18 @@ Example: `keyword (optional arguments)`
 expected output
 ```
 
-## Feature ABC
+## Sorting tasks
 
-// Feature details
+Enter `sort` to arrange all tasks alphabetically by their descriptions. Letter case does not affect
+the order. CatGPT saves the sorted order for future sessions.
+
+Example: `sort`
+
+```text
+Here are your tasks sorted alphabetically:
+1.[T][ ] attend meeting
+2.[T][ ] write report
+```
 
 
 ## Feature XYZ

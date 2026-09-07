@@ -112,6 +112,16 @@ public class Ui {
     }
 
     /**
+     * Formats tasks after they have been sorted alphabetically.
+     *
+     * @param tasks Sorted tasks to display.
+     * @return Formatted sorted task list.
+     */
+    public String formatSortedTaskList(TaskList tasks) {
+        return formatNumberedTasks("Here are your tasks sorted alphabetically:", tasks);
+    }
+
+    /**
      * Formats a heading followed by one-based, numbered tasks.
      *
      * @param heading Heading placed before the tasks.
