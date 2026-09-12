@@ -27,6 +27,7 @@ public class MainWindow extends AnchorPane {
     @FXML
     public void initialize() {
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
+        userInput.requestFocus();
     }
 
     /**
@@ -54,5 +55,6 @@ public class MainWindow extends AnchorPane {
                 DialogBox.getUserDialog(input),
                 DialogBox.getCatDialog(response));
         userInput.clear();
+        userInput.requestFocus();
     }
 }
