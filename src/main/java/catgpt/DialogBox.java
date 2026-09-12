@@ -17,7 +17,7 @@ import javafx.scene.layout.HBox;
  */
 public class DialogBox extends HBox {
     private static final String USER_AVATAR = "YOU";
-    private static final String CAT_AVATAR = "CAT";
+    private static final String CAT_AVATAR = "😹";
 
     @FXML
     private Label dialog;
@@ -36,6 +36,7 @@ public class DialogBox extends HBox {
         }
 
         dialog.setText(text);
+        dialog.setAccessibleText(text);
         avatar.setText(avatarText);
         getStyleClass().add("dialog-box");
     }

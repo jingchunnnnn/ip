@@ -31,8 +31,10 @@ public class Main extends Application {
         controller.setChatbot(chatbot);
 
         stage.setTitle("CatGPT");
-        stage.setMinWidth(420);
-        stage.setMinHeight(620);
+        stage.setMinWidth(520);
+        stage.setMinHeight(640);
+        stage.setWidth(720);
+        stage.setHeight(760);
         stage.setScene(scene);
         stage.show();
     }
