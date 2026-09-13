@@ -47,7 +47,7 @@
                                 <TextField fx:id="userInput" onAction="#handleUserInput"
                                            promptText="Type a command, e.g. todo read a book"
                                            HBox.hgrow="ALWAYS" />
-                                <Button defaultButton="true" mnemonicParsing="false"
+                                <Button fx:id="sendButton" defaultButton="true" mnemonicParsing="false"
                                         onAction="#handleUserInput" text="Send  →" />
                             </children>
                         </HBox>

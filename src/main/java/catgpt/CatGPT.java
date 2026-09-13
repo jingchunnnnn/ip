@@ -87,10 +87,23 @@ public class CatGPT {
      * @return User-facing response to the command.
      */
     public String getResponse(String input) {
+        return getCommandResult(input).response();
+    }
+
+    /**
+     * Processes one graphical-interface command and reports whether CatGPT should exit.
+     *
+     * @param input User command to process.
+     * @return Command response and exit state.
+     */
+    public CommandResult getCommandResult(String input) {
         try {
-            return execute(parser.parse(input));
+            Parser.ParsedCommand command = parser.parse(input);
+            String response = execute(command);
+            boolean shouldExit = command.getType() == Parser.CommandType.BYE;
+            return new CommandResult(response, shouldExit);
         } catch (CatGPTException error) {
-            return ui.formatError(error.getMessage());
+            return new CommandResult(ui.formatError(error.getMessage()), false);
         }
     }
 
