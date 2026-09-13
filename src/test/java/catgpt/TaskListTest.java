@@ -44,6 +44,18 @@ class TaskListTest {
     }
 
     @Test
+    void restoreTaskInsertsItAtOriginalPosition() {
+        Task firstTask = new Todo("read book");
+        Task secondTask = new Todo("write notes");
+        TaskList tasks = new TaskList(List.of(secondTask));
+
+        tasks.restore(0, firstTask);
+
+        assertSame(firstTask, tasks.get(0));
+        assertSame(secondTask, tasks.get(1));
+    }
+
+    @Test
     void markTaskUpdatesDisplayedStatus() throws CatGPTException {
         TaskList tasks = new TaskList();
         tasks.add(new Todo("read book"));
