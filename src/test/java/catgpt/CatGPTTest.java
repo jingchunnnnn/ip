@@ -1,6 +1,7 @@
 package catgpt;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -34,6 +35,26 @@ public class CatGPTTest {
         CatGPT chatbot = new CatGPT(temporaryDirectory.resolve("tasks.txt").toString());
 
         assertEquals("OOPS!!! I don't know what that means.", chatbot.getResponse("meow"));
+    }
+
+    @Test
+    public void getCommandResultByeReturnsFarewellAndExitSignal() {
+        CatGPT chatbot = new CatGPT(temporaryDirectory.resolve("tasks.txt").toString());
+
+        CommandResult result = chatbot.getCommandResult("bye");
+
+        assertEquals("Bye. Hope to see you again soon!", result.response());
+        assertTrue(result.shouldExit());
+    }
+
+    @Test
+    public void getCommandResultInvalidCommandDoesNotExit() {
+        CatGPT chatbot = new CatGPT(temporaryDirectory.resolve("tasks.txt").toString());
+
+        CommandResult result = chatbot.getCommandResult("bye now");
+
+        assertEquals("OOPS!!! I don't know what that means.", result.response());
+        assertFalse(result.shouldExit());
     }
 
     @Test

@@ -1,15 +1,21 @@
 package catgpt;
 
+import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 /**
  * Controls the main CatGPT chat window defined in FXML.
  */
 public class MainWindow extends AnchorPane {
+    private static final double EXIT_DELAY_SECONDS = 1.0;
+
     @FXML
     private ScrollPane scrollPane;
 
@@ -18,6 +24,9 @@ public class MainWindow extends AnchorPane {
 
     @FXML
     private TextField userInput;
+
+    @FXML
+    private Button sendButton;
 
     private CatGPT chatbot;
 
@@ -54,11 +63,19 @@ public class MainWindow extends AnchorPane {
             return;
         }
 
-        String response = chatbot.getResponse(input);
+        CommandResult result = chatbot.getCommandResult(input);
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input),
-                DialogBox.getCatDialog(response));
+                DialogBox.getCatDialog(result.response()));
         userInput.clear();
         userInput.requestFocus();
+
+        if (result.shouldExit()) {
+            userInput.setDisable(true);
+            sendButton.setDisable(true);
+            PauseTransition exitDelay = new PauseTransition(Duration.seconds(EXIT_DELAY_SECONDS));
+            exitDelay.setOnFinished(event -> Platform.exit());
+            exitDelay.play();
+        }
     }
 }
