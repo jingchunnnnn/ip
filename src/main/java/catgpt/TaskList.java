@@ -68,6 +68,18 @@ public class TaskList implements Iterable<Task> {
     }
 
     /**
+     * Restores a task at a specific zero-based position.
+     *
+     * @param index Position at which to insert the task.
+     * @param task Task to restore.
+     */
+    public void restore(int index, Task task) {
+        assert index >= 0 && index <= tasks.size() : "Restore index must be within the task list";
+        assert task != null : "Restored task must not be null";
+        tasks.add(index, task);
+    }
+
+    /**
      * Returns the number of tasks in the list.
      *
      * @return Task count.
@@ -95,6 +107,27 @@ public class TaskList implements Iterable<Task> {
      */
     public void sortByDescription() {
         tasks.sort(Comparator.comparing(Task::getDescription, String.CASE_INSENSITIVE_ORDER));
+    }
+
+    /**
+     * Returns an immutable snapshot of the current task order.
+     *
+     * @return Tasks in their current order.
+     */
+    public List<Task> snapshot() {
+        return List.copyOf(tasks);
+    }
+
+    /**
+     * Restores the task order from an earlier snapshot.
+     *
+     * @param previousTasks Tasks in the order to restore.
+     */
+    public void restoreOrder(List<Task> previousTasks) {
+        assert previousTasks != null : "Previous task order must not be null";
+        assert previousTasks.size() == tasks.size() : "Restored task order must contain every current task";
+        tasks.clear();
+        tasks.addAll(previousTasks);
     }
 
     /**

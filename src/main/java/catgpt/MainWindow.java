@@ -38,6 +38,10 @@ public class MainWindow extends AnchorPane {
     public void setChatbot(CatGPT chatbot) {
         this.chatbot = chatbot;
         dialogContainer.getChildren().add(DialogBox.getCatDialog(chatbot.getWelcomeMessage()));
+        String startupErrorMessage = chatbot.getStartupErrorMessage();
+        if (startupErrorMessage != null) {
+            dialogContainer.getChildren().add(DialogBox.getCatDialog(startupErrorMessage));
+        }
     }
 
     /**

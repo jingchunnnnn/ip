@@ -1,5 +1,7 @@
 package catgpt;
 
+import java.util.List;
+
 /**
  * Coordinates CatGPT's user interface, parser, task list, and storage.
  */
@@ -9,7 +11,8 @@ public class CatGPT {
     private final Storage storage;
     private final Ui ui;
     private final Parser parser;
-    private TaskList tasks;
+    private final TaskList tasks;
+    private final String startupErrorMessage;
 
     /**
      * Creates CatGPT using its default data-file location.
@@ -24,15 +27,30 @@ public class CatGPT {
      * @param filePath Path of the data file to load and save.
      */
     public CatGPT(String filePath) {
-        storage = new Storage(filePath);
+        this(new Storage(filePath));
+    }
+
+    /**
+     * Creates CatGPT with a supplied storage implementation.
+     *
+     * @param storage Storage used to load and save tasks.
+     */
+    CatGPT(Storage storage) {
+        assert storage != null : "Storage must not be null";
+        this.storage = storage;
         ui = new Ui();
         parser = new Parser();
+
+        TaskList loadedTasks;
+        String loadErrorMessage = null;
         try {
-            tasks = new TaskList(storage.load());
+            loadedTasks = new TaskList(storage.load());
         } catch (CatGPTException error) {
-            ui.showError(error.getMessage());
-            tasks = new TaskList();
+            loadedTasks = new TaskList();
+            loadErrorMessage = ui.formatError(error.getMessage());
         }
+        tasks = loadedTasks;
+        startupErrorMessage = loadErrorMessage;
     }
 
     /**
@@ -40,6 +58,9 @@ public class CatGPT {
      */
     public void run() {
         ui.showWelcome();
+        if (startupErrorMessage != null) {
+            ui.showResponse(startupErrorMessage);
+        }
         while (true) {
             String input = ui.readCommand();
             if (input == null) {
@@ -83,6 +104,15 @@ public class CatGPT {
     }
 
     /**
+     * Returns the storage error encountered during startup, if one occurred.
+     *
+     * @return Formatted startup error, or {@code null} if loading succeeded.
+     */
+    public String getStartupErrorMessage() {
+        return startupErrorMessage;
+    }
+
+    /**
      * Executes one parsed command.
      *
      * @param command Parsed command to execute.
@@ -106,7 +136,12 @@ public class CatGPT {
     private String addTask(Parser.ParsedCommand command) throws CatGPTException {
         Task task = parser.parseTask(command);
         tasks.add(task);
-        storage.save(tasks);
+        try {
+            storage.save(tasks);
+        } catch (CatGPTException error) {
+            tasks.delete(tasks.size() - 1);
+            throw error;
+        }
         return ui.formatTaskAdded(task, tasks.size());
     }
 
@@ -114,19 +149,44 @@ public class CatGPT {
             throws CatGPTException {
         int taskIndex = parser.parseTaskIndex(command, tasks.size());
         Task task = tasks.get(taskIndex);
+        boolean wasDone = task.isDone();
         if (isDone) {
             task.markAsDone();
         } else {
             task.markAsNotDone();
         }
-        storage.save(tasks);
+        try {
+            storage.save(tasks);
+        } catch (CatGPTException error) {
+            restoreTaskStatus(task, wasDone);
+            throw error;
+        }
         return ui.formatTaskStatusChanged(task, isDone);
+    }
+
+    /**
+     * Restores a task's completion state after persistence fails.
+     *
+     * @param task Task whose state must be restored.
+     * @param wasDone Completion state before the attempted change.
+     */
+    private void restoreTaskStatus(Task task, boolean wasDone) {
+        if (wasDone) {
+            task.markAsDone();
+        } else {
+            task.markAsNotDone();
+        }
     }
 
     private String deleteTask(Parser.ParsedCommand command) throws CatGPTException {
         int taskIndex = parser.parseTaskIndex(command, tasks.size());
         Task deletedTask = tasks.delete(taskIndex);
-        storage.save(tasks);
+        try {
+            storage.save(tasks);
+        } catch (CatGPTException error) {
+            tasks.restore(taskIndex, deletedTask);
+            throw error;
+        }
         return ui.formatTaskDeleted(deletedTask, tasks.size());
     }
 
@@ -137,8 +197,14 @@ public class CatGPT {
     }
 
     private String sortTasks() throws CatGPTException {
+        List<Task> previousOrder = tasks.snapshot();
         tasks.sortByDescription();
-        storage.save(tasks);
+        try {
+            storage.save(tasks);
+        } catch (CatGPTException error) {
+            tasks.restoreOrder(previousOrder);
+            throw error;
+        }
         return ui.formatSortedTaskList(tasks);
     }
 

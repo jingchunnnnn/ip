@@ -36,11 +36,11 @@ public class Storage {
      * @throws CatGPTException If the file cannot be read or contains invalid data.
      */
     public List<Task> load() throws CatGPTException {
-        if (!Files.exists(filePath)) {
-            return new ArrayList<>();
-        }
-
         try {
+            if (!Files.exists(filePath)) {
+                return new ArrayList<>();
+            }
+
             List<String> lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
             if (lines.size() > TaskList.MAX_TASKS) {
                 throw new CatGPTException("The saved task list contains too many tasks.");
@@ -51,7 +51,7 @@ public class Storage {
                 tasks.add(loadTask(lines.get(i), i));
             }
             return tasks;
-        } catch (IOException error) {
+        } catch (IOException | SecurityException error) {
             throw new CatGPTException("I couldn't load tasks from " + filePath + ".");
         }
     }
@@ -77,7 +77,7 @@ public class Storage {
                 Files.createDirectories(parentDirectory);
             }
             Files.write(filePath, lines, StandardCharsets.UTF_8);
-        } catch (IOException error) {
+        } catch (IOException | SecurityException error) {
             throw new CatGPTException("I couldn't save tasks to " + filePath + ".");
         }
     }
