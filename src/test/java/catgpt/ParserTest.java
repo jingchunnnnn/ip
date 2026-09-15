@@ -21,6 +21,30 @@ class ParserTest {
     }
 
     @Test
+    void parseCommandWithMixedCaseAndExtraSpacesReturnsNormalizedCommand()
+            throws CatGPTException {
+        Parser.ParsedCommand command = parser.parse("  ToDo   read book  ");
+
+        assertEquals(Parser.CommandType.TODO, command.getType());
+        assertEquals("read book", command.getArguments());
+    }
+
+    @Test
+    void parseEmptyCommandThrowsException() {
+        CatGPTException exception = assertThrows(CatGPTException.class, () -> parser.parse("   "));
+
+        assertEquals("Please enter a command.", exception.getMessage());
+    }
+
+    @Test
+    void parseByeCommandWithArgumentsThrowsException() {
+        CatGPTException exception = assertThrows(
+                CatGPTException.class, () -> parser.parse("bye now"));
+
+        assertEquals("I don't know what that means.", exception.getMessage());
+    }
+
+    @Test
     void parseSortCommandWithoutArgumentsReturnsSortType() throws CatGPTException {
         Parser.ParsedCommand command = parser.parse("sort");
 
@@ -64,6 +88,51 @@ class ParserTest {
         CatGPTException exception = assertThrows(
                 CatGPTException.class, () -> parser.parseTaskIndex(command, 2));
         assertEquals("That task number is not in your list.", exception.getMessage());
+    }
+
+    @Test
+    void parseTaskIndexWithoutNumberThrowsException() throws CatGPTException {
+        Parser.ParsedCommand command = parser.parse("delete");
+
+        CatGPTException exception = assertThrows(
+                CatGPTException.class, () -> parser.parseTaskIndex(command, 2));
+        assertEquals("Please provide a task number after 'delete'.", exception.getMessage());
+    }
+
+    @Test
+    void parseTaskIndexWithNonNumericValueThrowsException() throws CatGPTException {
+        Parser.ParsedCommand command = parser.parse("mark first");
+
+        CatGPTException exception = assertThrows(
+                CatGPTException.class, () -> parser.parseTaskIndex(command, 2));
+        assertEquals("The task number must be a whole number.", exception.getMessage());
+    }
+
+    @Test
+    void parseTaskEmptyTodoThrowsException() throws CatGPTException {
+        Parser.ParsedCommand command = parser.parse("todo");
+
+        CatGPTException exception = assertThrows(
+                CatGPTException.class, () -> parser.parseTask(command));
+        assertEquals("The description of a todo cannot be empty.", exception.getMessage());
+    }
+
+    @Test
+    void parseTaskDeadlineWithoutDateMarkerThrowsException() throws CatGPTException {
+        Parser.ParsedCommand command = parser.parse("deadline submit report tomorrow");
+
+        CatGPTException exception = assertThrows(
+                CatGPTException.class, () -> parser.parseTask(command));
+        assertEquals("Use: deadline DESCRIPTION /by yyyy-MM-dd", exception.getMessage());
+    }
+
+    @Test
+    void parseTaskEventWithoutEndMarkerThrowsException() throws CatGPTException {
+        Parser.ParsedCommand command = parser.parse("event meeting /from 2pm");
+
+        CatGPTException exception = assertThrows(
+                CatGPTException.class, () -> parser.parseTask(command));
+        assertEquals("Use: event DESCRIPTION /from START /to END", exception.getMessage());
     }
 
     @Test

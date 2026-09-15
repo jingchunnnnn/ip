@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -77,6 +78,42 @@ class TaskListTest {
         assertEquals(2, matchingTasks.size());
         assertSame(firstMatch, matchingTasks.get(0));
         assertSame(secondMatch, matchingTasks.get(1));
+    }
+
+    @Test
+    void findKeywordIgnoresLetterCase() {
+        Task uppercaseDescription = new Todo("Review Project Notes");
+        TaskList tasks = new TaskList(List.of(uppercaseDescription));
+
+        TaskList matchingTasks = tasks.find("project");
+
+        assertEquals(1, matchingTasks.size());
+        assertSame(uppercaseDescription, matchingTasks.get(0));
+    }
+
+    @Test
+    void addTaskToFullListThrowsException() {
+        List<Task> fullTaskList = new ArrayList<>();
+        for (int i = 0; i < TaskList.MAX_TASKS; i++) {
+            fullTaskList.add(new Todo("task " + i));
+        }
+        TaskList tasks = new TaskList(fullTaskList);
+
+        CatGPTException exception = assertThrows(
+                CatGPTException.class, () -> tasks.add(new Todo("one too many")));
+
+        assertEquals("Your task list is full.", exception.getMessage());
+        assertEquals(TaskList.MAX_TASKS, tasks.size());
+    }
+
+    @Test
+    void snapshotCannotBeModified() throws CatGPTException {
+        TaskList tasks = new TaskList();
+        tasks.add(new Todo("read book"));
+
+        List<Task> snapshot = tasks.snapshot();
+
+        assertThrows(UnsupportedOperationException.class, () -> snapshot.add(new Todo("write notes")));
     }
 
     @Test

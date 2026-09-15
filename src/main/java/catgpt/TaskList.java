@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Owns CatGPT's task collection and provides operations that modify it.
@@ -95,8 +96,11 @@ public class TaskList implements Iterable<Task> {
      * @return Matching tasks in their original order.
      */
     public TaskList find(String keyword) {
+        String normalizedKeyword = keyword.toLowerCase(Locale.ENGLISH);
         List<Task> matchingTasks = tasks.stream()
-                .filter(task -> task.getDescription().contains(keyword))
+                .filter(task -> task.getDescription()
+                        .toLowerCase(Locale.ENGLISH)
+                        .contains(normalizedKeyword))
                 .toList();
         return new TaskList(matchingTasks);
     }
