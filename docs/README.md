@@ -22,7 +22,7 @@ Use `todo DESCRIPTION` to add a task without a date or time.
 Example: `todo read chapter 3`
 
 ```text
-Got it. I've added this task:
+Purr-fect! I've added this task:
 [T][ ] read chapter 3
 Now you have 1 task in the list.
 ```
@@ -35,7 +35,7 @@ must use the shown year-month-day format.
 Example: `deadline submit report /by 2026-09-18`
 
 ```text
-Got it. I've added this task:
+Purr-fect! I've added this task:
 [D][ ] submit report (by: Sep 18 2026)
 Now you have 2 tasks in the list.
 ```
@@ -48,7 +48,7 @@ dates, or times.
 Example: `event project meeting /from Monday 2pm /to Monday 3pm`
 
 ```text
-Got it. I've added this task:
+Purr-fect! I've added this task:
 [E][ ] project meeting (from: Monday 2pm to: Monday 3pm)
 Now you have 3 tasks in the list.
 ```
@@ -74,7 +74,7 @@ Use `mark NUMBER` to mark a task as complete. Use the number shown by the `list`
 Example: `mark 1`
 
 ```text
-Nice! I've marked this task as done:
+Purr-fect! I've marked this task as done:
 [T][X] read chapter 3
 ```
 
@@ -133,7 +133,7 @@ Use `bye` to show the goodbye message and close the application.
 Example: `bye`
 
 ```text
-Bye. Hope to see you again soon!
+Time for a catnap. Your tasks are safe. See you again soon!
 ```
 
 ## Command summary

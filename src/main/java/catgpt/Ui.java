@@ -69,7 +69,9 @@ public class Ui {
      * @return Greeting for the user.
      */
     public String getWelcomeMessage() {
-        return formatLines("Hello! I'm CatGPT.", "What can I do for you?");
+        return formatLines(
+                "Hello! I'm CatGPT, your task-tracking cat.",
+                "What can I help you organize today?");
     }
 
     /**
@@ -78,7 +80,7 @@ public class Ui {
      * @return Farewell for the user.
      */
     public String getGoodbyeMessage() {
-        return "Bye. Hope to see you again soon!";
+        return "Time for a catnap. Your tasks are safe. See you again soon!";
     }
 
     /**
@@ -88,7 +90,7 @@ public class Ui {
      * @return Formatted error response.
      */
     public String formatError(String message) {
-        return "OOPS!!! " + message;
+        return "My whiskers got crossed. " + message;
     }
 
     /**
@@ -147,7 +149,7 @@ public class Ui {
      */
     public String formatTaskAdded(Task task, int taskCount) {
         return formatLines(
-                "Got it. I've added this task:",
+                "Purr-fect! I've added this task:",
                 task.toString(),
                 formatTaskCount(taskCount));
     }
@@ -175,7 +177,7 @@ public class Ui {
      */
     public String formatTaskStatusChanged(Task task, boolean isDone) {
         String message = isDone
-                ? "Nice! I've marked this task as done:"
+                ? "Purr-fect! I've marked this task as done:"
                 : "OK! I've marked this task as not done yet:";
         return formatLines(message, task.toString());
     }

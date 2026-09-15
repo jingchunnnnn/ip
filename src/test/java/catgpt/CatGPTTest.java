@@ -34,7 +34,9 @@ public class CatGPTTest {
     public void getResponseInvalidCommandReturnsUserFriendlyError() {
         CatGPT chatbot = new CatGPT(temporaryDirectory.resolve("tasks.txt").toString());
 
-        assertEquals("OOPS!!! I don't know what that means.", chatbot.getResponse("meow"));
+        assertEquals(
+                "My whiskers got crossed. I don't know what that means.",
+                chatbot.getResponse("meow"));
     }
 
     @Test
@@ -43,7 +45,7 @@ public class CatGPTTest {
 
         CommandResult result = chatbot.getCommandResult("bye");
 
-        assertEquals("Bye. Hope to see you again soon!", result.response());
+        assertEquals("Time for a catnap. Your tasks are safe. See you again soon!", result.response());
         assertTrue(result.shouldExit());
     }
 
@@ -53,7 +55,7 @@ public class CatGPTTest {
 
         CommandResult result = chatbot.getCommandResult("bye now");
 
-        assertEquals("OOPS!!! I don't know what that means.", result.response());
+        assertEquals("My whiskers got crossed. I don't know what that means.", result.response());
         assertFalse(result.shouldExit());
     }
 
@@ -80,7 +82,7 @@ public class CatGPTTest {
 
         String response = chatbot.getResponse("todo read book");
 
-        assertEquals("OOPS!!! Simulated save failure.", response);
+        assertEquals("My whiskers got crossed. Simulated save failure.", response);
         assertEquals("Here are the tasks in your list:", chatbot.getResponse("list"));
     }
 
@@ -90,7 +92,7 @@ public class CatGPTTest {
 
         String response = chatbot.getResponse("mark 1");
 
-        assertEquals("OOPS!!! Simulated save failure.", response);
+        assertEquals("My whiskers got crossed. Simulated save failure.", response);
         assertTrue(chatbot.getResponse("list").contains("1.[T][ ] read book"));
     }
 
@@ -100,7 +102,7 @@ public class CatGPTTest {
 
         String response = chatbot.getResponse("delete 1");
 
-        assertEquals("OOPS!!! Simulated save failure.", response);
+        assertEquals("My whiskers got crossed. Simulated save failure.", response);
         assertTrue(chatbot.getResponse("list").contains("1.[T][ ] read book"));
     }
 
@@ -111,7 +113,7 @@ public class CatGPTTest {
 
         String response = chatbot.getResponse("sort");
 
-        assertEquals("OOPS!!! Simulated save failure.", response);
+        assertEquals("My whiskers got crossed. Simulated save failure.", response);
         assertTrue(chatbot.getResponse("list").contains(
                 "1.[T][ ] write report" + System.lineSeparator()
                         + "2.[T][ ] attend meeting"));
@@ -125,7 +127,7 @@ public class CatGPTTest {
         CatGPT chatbot = new CatGPT(dataFile.toString());
 
         assertEquals(
-                "OOPS!!! The saved task data is corrupted at line 1.",
+                "My whiskers got crossed. The saved task data is corrupted at line 1.",
                 chatbot.getStartupErrorMessage());
         assertEquals("Here are the tasks in your list:", chatbot.getResponse("list"));
     }
